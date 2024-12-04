@@ -329,7 +329,7 @@ select
 	count("CREDIT_PURCHASE".id) as 銷售數量
 from "CREDIT_PURCHASE"
 inner join "CREDIT_PACKAGE" on "CREDIT_PURCHASE".credit_package_id  = "CREDIT_PACKAGE".id
-where extract(month from "CREDIT_PURCHASE".purchase_at) = 11
+where extract(month from "CREDIT_PURCHASE".purchase_at) = 12
 group by "CREDIT_PACKAGE".name;
 
 
@@ -339,15 +339,15 @@ group by "CREDIT_PACKAGE".name;
 select 
 	coalesce (sum(price_paid), 0) as 總營收
 from "CREDIT_PURCHASE"
-where extract(month from "CREDIT_PURCHASE".purchase_at) = 11;
+where extract(month from "CREDIT_PURCHASE".purchase_at) = 12;
 
 
   -- 6-5. 查詢：計算 11 月份有預約課程的會員人數（需使用 Distinct，並用 created_at 和 status 欄位統計）
   -- 顯示須包含以下欄位： 預約會員人數
 
 select 
-	count(distinct user_id) as 預約課程會員數
+	count(distinct user_id) as 預約會員人數
 from "COURSE_BOOKING" 
-where extract(month from created_at ) = 11
+where extract(month from created_at ) = 12
   and status != '課程已取消';
     
