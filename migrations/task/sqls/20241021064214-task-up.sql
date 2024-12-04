@@ -184,7 +184,7 @@ INSERT INTO "COURSE_BOOKING"(user_id,course_id ,booking_at,status) VALUES
   (SELECT id FROM "COURSE" where user_id = (select id from "USER" where name = '李燕容')),
   '2024-11-24 16:00:00',
   '即將授課'
-)
+);
 
 
 -- 2. 新增： `好野人` 預約 `李燕容` 的課程
@@ -198,7 +198,7 @@ INSERT INTO "COURSE_BOOKING"(user_id,course_id,booking_at,status) VALUES
   (SELECT id FROM "COURSE" WHERE user_id = (select id from "USER" where name = '李燕容')),
   '2024-11-24 16:00:00',
   '即將授課'
-)
+);
 
 
 -- 5-2. 修改：`王小明`取消預約 `李燕容` 的課程，請在`COURSE_BOOKING`更新該筆預約資料：
@@ -207,7 +207,7 @@ INSERT INTO "COURSE_BOOKING"(user_id,course_id,booking_at,status) VALUES
 
 UPDATE "COURSE_BOOKING"
 SET cancelled_at = '2024-11-24 17:00:00',status = '課程已取消'
-WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明');
 
 
 -- 5-3. 新增：`王小明`再次預約 `李燕容`   的課程，請在`COURSE_BOOKING`新增一筆資料：
@@ -221,13 +221,13 @@ INSERT INTO "COURSE_BOOKING"(user_id,course_id ,booking_at,status) VALUES
   (SELECT id FROM "COURSE" WHERE user_id = (select id from "USER" where name = '李燕容')),
   '2024-11-24 17:10:25',
   '即將授課'
-)
+);
 
 
 -- 5-4. 查詢：取得王小明所有的預約紀錄，包含取消預約的紀錄
 
 SELECT * FROM "COURSE_BOOKING"
-WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明');
 
 
 -- 5-5. 修改：`王小明` 現在已經加入直播室了，請在`COURSE_BOOKING`更新該筆預約資料（請注意，不要更新到已經取消的紀錄）：
@@ -236,7 +236,7 @@ WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
 
 UPDATE "COURSE_BOOKING"
 SET join_at = '2024-11-25 14:01:59',status = '上課中'
-WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明') AND status = '即將授課'
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明') AND status = '即將授課';
 
 
 -- 5-6. 查詢：計算用戶王小明的購買堂數，顯示須包含以下欄位： user_id , total。 (需使用到 SUM 函式與 Group By)
@@ -246,7 +246,7 @@ SELECT
   SUM(purchased_credits) AS total
 FROM "CREDIT_PURCHASE"
 WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
-GROUP BY user_id
+GROUP BY user_id;
 
 
 -- 5-7. 查詢：計算用戶王小明的已使用堂數，顯示須包含以下欄位： user_id , total。 (需使用到 Count 函式與 Group By)
@@ -257,7 +257,7 @@ select
 from  "COURSE_BOOKING" 
 where status = '上課中' 
 and user_id = (select id from "USER" where name = '王小明')
-group by user_id 
+group by user_id;
 
 -- 5-8. [挑戰題] 查詢：請在一次查詢中，計算用戶王小明的剩餘可用堂數，顯示須包含以下欄位： user_id , remaining_credit
 -- 提示：
