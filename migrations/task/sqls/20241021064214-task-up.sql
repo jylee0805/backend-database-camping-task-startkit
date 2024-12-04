@@ -164,70 +164,144 @@ INSERT INTO "COURSE" (user_id ,skill_id,name,start_at,end_at,max_participants,me
  );
 
 
-
--- ████████  █████   █    █████ 
---   █ █   ██    █  █     █     
---   █ █████ ███ ███      ████  
---   █ █   █    ██  █         █ 
---   █ █   █████ █   █    ████  
+-- ████████  █████   █    █████
+--   █ █   ██    █  █     █
+--   █ █████ ███ ███      ████
+--   █ █   █    ██  █         █
+--   █ █   █████ █   █    ████
 -- ===================== ====================
-
 -- 5. 客戶預約與授課 COURSE_BOOKING
+
 -- 5-1. 新增：請在 `COURSE_BOOKING` 新增兩筆資料：
-    -- 1. 第一筆：`王小明`預約 `李燕容` 的課程
-        -- 1. 預約人設為`王小明`
-        -- 2. 預約時間`booking_at` 設為2024-11-24 16:00:00
-        -- 3. 狀態`status` 設定為即將授課
-    -- 2. 新增： `好野人` 預約 `李燕容` 的課程
-        -- 1. 預約人設為 `好野人`
-        -- 2. 預約時間`booking_at` 設為2024-11-24 16:00:00
-        -- 3. 狀態`status` 設定為即將授課
+-- 1. 第一筆：`王小明`預約 `李燕容` 的課程
+-- 1. 預約人設為`王小明`
+-- 2. 預約時間`booking_at` 設為2024-11-24 16:00:00
+-- 3. 狀態`status` 設定為即將授課
+
+INSERT INTO "COURSE_BOOKING"(user_id,course_id ,booking_at,status) VALUES
+(
+	(SELECT id FROM "USER" WHERE name = '王小明'),
+  (SELECT id FROM "COURSE" where user_id = (select id from "USER" where name = '李燕容')),
+  '2024-11-24 16:00:00',
+  '即將授課'
+)
+
+
+-- 2. 新增： `好野人` 預約 `李燕容` 的課程
+-- 1. 預約人設為 `好野人`
+-- 2. 預約時間`booking_at` 設為2024-11-24 16:00:00
+-- 3. 狀態`status` 設定為即將授課
+
+INSERT INTO "COURSE_BOOKING"(user_id,course_id,booking_at,status) VALUES
+(
+	(SELECT id FROM "USER" WHERE name = '好野人'),
+  (SELECT id FROM "COURSE" WHERE user_id = (select id from "USER" where name = '李燕容')),
+  '2024-11-24 16:00:00',
+  '即將授課'
+)
+
 
 -- 5-2. 修改：`王小明`取消預約 `李燕容` 的課程，請在`COURSE_BOOKING`更新該筆預約資料：
-    -- 1. 取消預約時間`cancelled_at` 設為2024-11-24 17:00:00
-    -- 2. 狀態`status` 設定為課程已取消
+-- 1. 取消預約時間`cancelled_at` 設為2024-11-24 17:00:00
+-- 2. 狀態`status` 設定為課程已取消
+
+UPDATE "COURSE_BOOKING"
+SET cancelled_at = '2024-11-24 17:00:00',status = '課程已取消'
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
+
 
 -- 5-3. 新增：`王小明`再次預約 `李燕容`   的課程，請在`COURSE_BOOKING`新增一筆資料：
-    -- 1. 預約人設為`王小明`
-    -- 2. 預約時間`booking_at` 設為2024-11-24 17:10:25
-    -- 3. 狀態`status` 設定為即將授課
+-- 1. 預約人設為`王小明`
+-- 2. 預約時間`booking_at` 設為2024-11-24 17:10:25
+-- 3. 狀態`status` 設定為即將授課
+
+INSERT INTO "COURSE_BOOKING"(user_id,course_id ,booking_at,status) VALUES
+(
+	(SELECT id FROM "USER" WHERE name = '王小明'),
+  (SELECT id FROM "COURSE" WHERE user_id = (select id from "USER" where name = '李燕容')),
+  '2024-11-24 17:10:25',
+  '即將授課'
+)
+
 
 -- 5-4. 查詢：取得王小明所有的預約紀錄，包含取消預約的紀錄
 
+SELECT * FROM "COURSE_BOOKING"
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
+
+
 -- 5-5. 修改：`王小明` 現在已經加入直播室了，請在`COURSE_BOOKING`更新該筆預約資料（請注意，不要更新到已經取消的紀錄）：
-    -- 1. 請在該筆預約記錄他的加入直播室時間 `join_at` 設為2024-11-25 14:01:59
-    -- 2. 狀態`status` 設定為上課中
+-- 1. 請在該筆預約記錄他的加入直播室時間 `join_at` 設為2024-11-25 14:01:59
+-- 2. 狀態`status` 設定為上課中
+
+UPDATE "COURSE_BOOKING"
+SET join_at = '2024-11-25 14:01:59',status = '上課中'
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明') AND status = '即將授課'
+
 
 -- 5-6. 查詢：計算用戶王小明的購買堂數，顯示須包含以下欄位： user_id , total。 (需使用到 SUM 函式與 Group By)
 
+SELECT
+	user_id,
+  SUM(purchased_credits) AS total
+FROM "CREDIT_PURCHASE"
+WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
+GROUP BY user_id
+
+
 -- 5-7. 查詢：計算用戶王小明的已使用堂數，顯示須包含以下欄位： user_id , total。 (需使用到 Count 函式與 Group By)
 
+select 
+	user_id,
+	count(*) as total 
+from  "COURSE_BOOKING" 
+where status = '上課中' 
+and user_id = (select id from "USER" where name = '王小明')
+group by user_id 
+
 -- 5-8. [挑戰題] 查詢：請在一次查詢中，計算用戶王小明的剩餘可用堂數，顯示須包含以下欄位： user_id , remaining_credit
-    -- 提示：
-    -- select ("CREDIT_PURCHASE".total_credit - "COURSE_BOOKING".used_credit) as remaining_credit, ...
-    -- from ( 用戶王小明的購買堂數 ) as "CREDIT_PURCHASE"
-    -- inner join ( 用戶王小明的已使用堂數) as "COURSE_BOOKING"
-    -- on "COURSE_BOOKING".user_id = "CREDIT_PURCHASE".user_id;
+-- 提示：
+
+select 
+ 	("CREDIT_PURCHASE".total_credit - "COURSE_BOOKING".used_credit) as remaining_credit,
+ 	"CREDIT_PURCHASE".user_id
+ from ( 
+	select "CREDIT_PURCHASE".user_id,
+		SUM("CREDIT_PURCHASE".purchased_credits) as total_credit
+	FROM "CREDIT_PURCHASE"
+	WHERE user_id = (SELECT id FROM "USER" WHERE name = '王小明')
+	GROUP BY user_id
+	) as "CREDIT_PURCHASE"
+ inner join ( 
+ 	select 
+	  user_id,
+	  count(*) as used_credit
+	from  "COURSE_BOOKING" 
+	where status != '課程已取消'
+	and user_id = (select id from "USER" where name = '王小明')
+	group by user_id
+ ) as "COURSE_BOOKING"
+ on "COURSE_BOOKING".user_id = "CREDIT_PURCHASE".user_id;
 
 
--- ████████  █████   █     ███  
---   █ █   ██    █  █     █     
---   █ █████ ███ ███      ████  
---   █ █   █    ██  █     █   █ 
---   █ █   █████ █   █     ███  
+-- ████████  █████   █     ███
+--   █ █   ██    █  █     █
+--   █ █████ ███ ███      ████
+--   █ █   █    ██  █     █   █
+--   █ █   █████ █   █     ███
 -- ===================== ====================
--- 6. 後台報表
+-- 6. 後台報表*****
 -- 6-1 查詢：查詢專長為重訓的教練，並按經驗年數排序，由資深到資淺（需使用 inner join 與 order by 語法)
 -- 顯示須包含以下欄位： 教練名稱 , 經驗年數, 專長名稱
 
--- 6-2 查詢：查詢每種專長的教練數量，並只列出教練數量最多的專長（需使用 group by, inner join 與 order by 與 limit 語法）
--- 顯示須包含以下欄位： 專長名稱, coach_total
+  -- 6-2 查詢：查詢每種專長的教練數量，並只列出教練數量最多的專長（需使用 group by, inner join 與 order by 與 limit 語法）
+  -- 顯示須包含以下欄位： 專長名稱, coach_total
 
--- 6-3. 查詢：計算 11 月份組合包方案的銷售數量
--- 顯示須包含以下欄位： 組合包方案名稱, 銷售數量
+  -- 6-3. 查詢：計算 11 月份組合包方案的銷售數量
+  -- 顯示須包含以下欄位： 組合包方案名稱, 銷售數量
 
--- 6-4. 查詢：計算 11 月份總營收（使用 purchase_at 欄位統計）
--- 顯示須包含以下欄位： 總營收
+  -- 6-4. 查詢：計算 11 月份總營收（使用 purchase_at 欄位統計）
+  -- 顯示須包含以下欄位： 總營收
 
--- 6-5. 查詢：計算 11 月份有預約課程的會員人數（需使用 Distinct，並用 created_at 和 status 欄位統計）
--- 顯示須包含以下欄位： 預約會員人數
+  -- 6-5. 查詢：計算 11 月份有預約課程的會員人數（需使用 Distinct，並用 created_at 和 status 欄位統計）
+  -- 顯示須包含以下欄位： 預約會員人數
